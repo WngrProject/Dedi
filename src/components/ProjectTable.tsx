@@ -558,7 +558,7 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
           if (val && typeof val === "object" && val.seconds !== undefined) {
             return formatDate(val);
           }
-          if (h.toLowerCase().includes("nilai") || h.toLowerCase().includes("harga")) {
+          if (h.toLowerCase().includes("nilai") || h.toLowerCase().includes("harga") || h === "Volume BoQ") {
             return formatCurrency(val);
           }
           if (h === "Bobot") {
@@ -1081,7 +1081,7 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
                         if (h.toLowerCase().includes("tanggal") || h === "Tanggal SJ") {
                           contentToRender = <span className="font-semibold text-slate-500 dark:text-slate-400">{formatDate(val)}</span>;
                           cellStyle = "text-center whitespace-nowrap";
-                        } else if (h.toLowerCase().includes("nilai") || h.toLowerCase().includes("harga") || h.toLowerCase().includes("pembayaran") || h.toLowerCase().includes("total") || h === "HP BoQ") {
+                        } else if (h.toLowerCase().includes("nilai") || h.toLowerCase().includes("harga") || h.toLowerCase().includes("pembayaran") || h.toLowerCase().includes("total") || h === "HP BoQ" || h === "Volume BoQ") {
                           contentToRender = <span className="font-semibold text-slate-900 dark:text-white">{formatCurrency(val)}</span>;
                           cellStyle = "text-right whitespace-nowrap";
                         } else if (h === "Bobot") {
