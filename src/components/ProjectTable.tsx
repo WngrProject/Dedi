@@ -55,6 +55,55 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Pre-process and map virtual fields (computed dynamically) for BOQ views
+  const processedData = useMemo(() => {
+    return data.map(row => {
+      if (viewId === "jrp-jobj-boq" || viewId.endsWith("-boq")) {
+        // If it doesn't have Volume BoQ or Price, calculate from available fields
+        let price = row["Harga Satuan"];
+        if (price === undefined || price === null || price === "") {
+          price = row["Harga Satuan Distribusi"] !== undefined && row["Harga Satuan Distribusi"] !== ""
+            ? row["Harga Satuan Distribusi"]
+            : row["Harga Satuan Feeder"];
+        }
+
+        let volumeBoQ = row["Volume BoQ"];
+        if (volumeBoQ === undefined || volumeBoQ === null || volumeBoQ === "") {
+          // Sum all numeric keys except known non-cluster/metadata keys
+          const nonClusterKeys = [
+            "id", "CreatedAt", "Item Pekerjaan", "Satuan", "Keterangan", "docId", "Bobot",
+            "Harga Satuan", "Harga Satuan Feeder", "Harga Satuan Distribusi", "Total Nilai BoQ", "Volume BoQ"
+          ];
+          let totalVol = 0;
+          Object.keys(row).forEach(key => {
+            if (!nonClusterKeys.includes(key)) {
+              const val = parseFloat(String(row[key]).replace(/,/g, ""));
+              if (!isNaN(val)) {
+                totalVol += val;
+              }
+            }
+          });
+          volumeBoQ = totalVol;
+        }
+
+        let totalNilaiBoQ = row["Total Nilai BoQ"];
+        if (totalNilaiBoQ === undefined || totalNilaiBoQ === null || totalNilaiBoQ === "") {
+          const p = parseFloat(String(price).replace(/,/g, "")) || 0;
+          const v = parseFloat(String(volumeBoQ).replace(/,/g, "")) || 0;
+          totalNilaiBoQ = p * v;
+        }
+
+        return {
+          ...row,
+          "Harga Satuan": price !== undefined && price !== null && price !== "" ? price : 0,
+          "Volume BoQ": volumeBoQ,
+          "Total Nilai BoQ": totalNilaiBoQ
+        };
+      }
+      return row;
+    });
+  }, [data, viewId]);
+
   // Sorting
   const [sortState, setSortState] = useState<SortState>({
     column: "",
@@ -237,10 +286,10 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
     }
     
     // Default fallback columns if any
-    return data.length > 0 
-      ? Object.keys(data[0]).filter(k => k !== "id" && k !== "CreatedAt" && k !== "docId")
+    return processedData.length > 0 
+      ? Object.keys(processedData[0]).filter(k => k !== "id" && k !== "CreatedAt" && k !== "docId")
       : [];
-  }, [viewId, data]);
+  }, [viewId, processedData]);
 
   // Extract filter parameters from raw data
   const filterParams = useMemo(() => {
@@ -258,7 +307,7 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
     const locations = new Set<string>();
     const statuses = new Set<string>();
 
-    data.forEach(item => {
+    processedData.forEach(item => {
       // Years SPK/PO/Payment
       const dateVal = item["Tanggal SPK"] || item["Tanggal Pembayaran"] || item["Tanggal Invoice"] || item["Tanggal PO"] || item["Tanggal SJ"];
       if (dateVal) {
@@ -299,14 +348,14 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
       locations: Array.from(locations).sort(),
       statuses: Array.from(statuses).sort()
     };
-  }, [data]);
+  }, [processedData]);
 
   // Autocomplete suggestion collection
   const stringSuggestions = useMemo(() => {
     if (!searchTerm || searchTerm.length < 2) return [];
     const suggestions = new Set<string>();
     
-    data.forEach(item => {
+    processedData.forEach(item => {
       headers.forEach(h => {
         const val = item[h];
         if (val && typeof val === "string" && val.toLowerCase().includes(searchTerm.toLowerCase())) {
@@ -316,11 +365,11 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
     });
 
     return Array.from(suggestions).slice(0, 8);
-  }, [searchTerm, data, headers]);
+  }, [searchTerm, processedData, headers]);
 
   // Filtering + Sorting workflow
   const filteredAndSortedData = useMemo(() => {
-    let result = [...data];
+    let result = [...processedData];
 
     // 1. Text Search matching keywords
     if (searchTerm.trim()) {
@@ -397,7 +446,7 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
     if (sortState.column) {
       const col = sortState.column;
       const desc = sortState.direction === "desc";
-      const originalIndexes = new Map(data.map((item, idx) => [item, idx]));
+      const originalIndexes = new Map<any, number>(processedData.map((item, idx) => [item, idx]));
       result.sort((a, b) => {
         if (col === "No") {
           const idxA = originalIndexes.get(a) ?? 0;
@@ -430,7 +479,7 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
     }
 
     return result;
-  }, [data, searchTerm, filters, sortState, headers]);
+  }, [processedData, searchTerm, filters, sortState, headers]);
 
   // Formulated pagination limits
   const totalEntriesCount = filteredAndSortedData.length;
@@ -1099,7 +1148,7 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
               </tbody>
 
               {/* Total calculations footer row */}
-              {data.length > 0 && (
+              {processedData.length > 0 && (
                 <tfoot>
                   <tr className="bg-slate-100 dark:bg-slate-900 border-t-2 border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 font-extrabold text-xs">
                     <td className="py-2 px-3 text-center border-r border-slate-200 dark:border-slate-700"></td>
