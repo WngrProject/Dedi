@@ -407,7 +407,7 @@ export default function DashboardOverview({ proyek, pembayaran, tagihan, onSelec
             <CheckCircle className="w-4 h-4 text-[#198754]" />
             <span>Alokasi Status Proyek</span>
           </h3>
-          <div className="h-56 w-full relative flex items-center justify-center">
+          <div className="h-72 w-full relative flex items-center justify-center">
             {chartStatusData.length === 0 ? (
               <p className="text-slate-400 text-xs font-medium">Belum ada data status</p>
             ) : (
