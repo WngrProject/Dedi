@@ -8,7 +8,7 @@ import {
 import { FilterState, SortState } from "../types";
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 interface AnimatedCounterProps {
   value: number;
@@ -574,7 +574,7 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
 
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [cols],
       body: rowsData,
       startY: 20,
