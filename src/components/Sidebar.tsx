@@ -257,8 +257,8 @@ export default function Sidebar({ currentViewId, onSelectView, isOpenOnMobile, o
               <Sparkles className="w-4.5 h-4.5" />
             </div>
             <div className={isCollapsed ? "lg:hidden" : "block"}>
-              <h1 className="font-bold text-white tracking-normal text-sm leading-tight uppercase whitespace-nowrap">MY PROYEK</h1>
-              <p className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase whitespace-nowrap">Pantau Proyek</p>
+              <h1 className="font-bold text-white tracking-normal text-sm leading-tight uppercase whitespace-nowrap">Pantau Proyek</h1>
+              <p className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase whitespace-nowrap">Project Update Realtime</p>
             </div>
           </div>
           <button 
