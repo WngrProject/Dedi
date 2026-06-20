@@ -360,7 +360,14 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
     if (sortState.column) {
       const col = sortState.column;
       const desc = sortState.direction === "desc";
+      const originalIndexes = new Map(data.map((item, idx) => [item, idx]));
       result.sort((a, b) => {
+        if (col === "No") {
+          const idxA = originalIndexes.get(a) ?? 0;
+          const idxB = originalIndexes.get(b) ?? 0;
+          return desc ? idxB - idxA : idxA - idxB;
+        }
+
         let valA = a[col];
         let valB = b[col];
 
@@ -892,7 +899,15 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
               <thead>
                 <tr className="bg-slate-100 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold uppercase tracking-wide sticky top-0 z-[5]">
                   <th className="py-2.5 px-3 text-center w-12 border-r border-slate-200 dark:border-slate-750">Aksi</th>
-                  <th className="py-2.5 px-3 text-center w-12 border-r border-slate-200 dark:border-slate-750">No</th>
+                  <th
+                    onClick={() => requestSort("No")}
+                    className="py-2.5 px-3 w-16 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 select-none whitespace-nowrap text-center transition-all border-r border-slate-200 dark:border-slate-750"
+                  >
+                    <div className="flex items-center justify-center gap-1">
+                      <span>No</span>
+                      <ArrowUpDown className={`w-3 h-3 ${sortState.column === "No" ? "text-blue-500" : "text-slate-400"}`} />
+                    </div>
+                  </th>
                   {headers.map(h => {
                     const isSorted = sortState.column === h;
                     return (
@@ -986,7 +1001,7 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
                         }
 
                         return (
-                          <td key={h} className={`py-2 px-3 text-xs border-r border-slate-200 dark:border-slate-700 align-middle ${cellStyle}`}>
+                          <td key={h} className={`py-2 px-3 text-xs border-r border-slate-200 dark:border-slate-700 align-middle whitespace-nowrap ${cellStyle}`}>
                             {contentToRender}
                           </td>
                         );
@@ -1053,7 +1068,7 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
 
         {/* Paginated Controller footer */}
         {filters.entries !== "Semua" && totalEntriesCount > 0 && (
-          <div className="px-4 py-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="px-4 py-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3 text-xs">
             <span className="text-slate-500 dark:text-slate-400 font-semibold">
               Menampilkan {Math.min(filteredAndSortedData.length, (currentPage - 1) * itemsPerPage + 1)} s/d {Math.min(filteredAndSortedData.length, currentPage * itemsPerPage)} dari {filteredAndSortedData.length} baris data
             </span>

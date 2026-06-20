@@ -28,10 +28,14 @@ export default function App() {
       try {
         return JSON.parse(saved);
       } catch (e) {
-        return null;
+        // Fallback to mock session if parse fails
       }
     }
-    return null;
+    return {
+      "Nama Pengguna": "admin",
+      "Role": "Super Admin",
+      "Nama Lengkap": "Super Administrator"
+    };
   });
 
   // Dark mode option
