@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MenuItem, MenuSection } from "../types";
 import { 
   X, LayoutDashboard, Database, Briefcase, Landmark, Users, 
@@ -171,11 +171,49 @@ export default function Sidebar({ currentViewId, onSelectView, isOpenOnMobile, o
     return initial;
   });
 
+  // Auto-collapse other sections when the current view (navigation) changes
+  useEffect(() => {
+    let foundSubId: string | null = null;
+    let isDashboardActive = false;
+
+    menuSections.forEach(section => {
+      if (section.items) {
+        const hasItem = section.items.some(it => it.id === currentViewId);
+        if (hasItem) {
+          if (section.title === "Dashboard") {
+            isDashboardActive = true;
+          }
+        }
+      }
+      if (section.subsections) {
+        section.subsections.forEach(sub => {
+          const hasItem = sub.items.some(it => it.id === currentViewId);
+          if (hasItem) {
+            foundSubId = sub.id;
+          }
+        });
+      }
+    });
+
+    if (isDashboardActive) {
+      setIsDashboardOpen(true);
+      setOpenSubsections({});
+    } else if (foundSubId) {
+      setIsDashboardOpen(false);
+      setOpenSubsections({ [foundSubId]: true });
+    } else {
+      // Direct category or none
+      setOpenSubsections({});
+    }
+  }, [currentViewId]);
+
   const toggleSubsection = (id: string) => {
-    setOpenSubsections(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
+    setOpenSubsections(prev => {
+      const next: Record<string, boolean> = {};
+      next[id] = !prev[id];
+      return next;
+    });
+    setIsDashboardOpen(false);
   };
 
   const selectSectionIcon = (iconName: string) => {
@@ -342,7 +380,10 @@ export default function Sidebar({ currentViewId, onSelectView, isOpenOnMobile, o
               <div key={section.id} className="space-y-1">
                 {/* Category Title Header - Bootstrap Style */}
                 <div 
-                  onClick={section.title === "Dashboard" ? () => setIsDashboardOpen(!isDashboardOpen) : undefined}
+                  onClick={section.title === "Dashboard" ? () => {
+                    setIsDashboardOpen(!isDashboardOpen);
+                    setOpenSubsections({});
+                  } : undefined}
                   className={`px-3 py-1 flex items-center justify-between bg-slate-800/20 rounded ${section.title === "Dashboard" ? "cursor-pointer hover:bg-slate-800/45 select-none" : ""}`}
                 >
                   <div className="flex items-center gap-2">
