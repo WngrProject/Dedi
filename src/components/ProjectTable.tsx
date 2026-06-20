@@ -777,7 +777,7 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
                 onFocus={() => setShowSuggestions(true)}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                 placeholder="Cari..."
-                className="w-full pl-8 pr-7 py-1 text-xs rounded bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/10 transition-all font-semibold"
+                className="w-full pl-8 pr-7 py-1.5 text-xs rounded bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/10 transition-all font-semibold"
               />
               {searchTerm && (
                 <button
