@@ -76,6 +76,7 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
       materialName: "Semua Material",
       statusMaterial: "Semua Status Material",
       entries: "Semua",
+      textSearch: "",
       tahunInvoice: "Semua Tahun Invoice",
       bulanInvoice: "Semua Bulan Invoice",
       tahunPembayaran: "Semua Tahun Pembayaran",
@@ -91,6 +92,10 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
       lokasiKerja: "Semua Lokasi Kerja",
       project: "Semua Project",
       hadir: "Semua Hadir"
+    });
+    setSortState({
+      column: "",
+      direction: "asc"
     });
     setCurrentPage(1);
   };
