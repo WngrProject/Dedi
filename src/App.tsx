@@ -10,7 +10,8 @@ import MapPane from "./components/MapPane";
 import DataModal from "./components/DataModal";
 import { 
   LogOut, Menu, User, Shield, AlertTriangle, CheckCircle2, 
-  Sparkles, BellRing, Moon, Sun, Lock, Loader2, ArrowRight
+  Sparkles, BellRing, Moon, Sun, Lock, Loader2, ArrowRight,
+  ChevronLeft, ChevronRight
 } from "lucide-react";
 
 interface ToastMessage {
@@ -49,6 +50,7 @@ export default function App() {
   const [currentViewTitle, setCurrentViewTitle] = useState<string>("Overview");
   const [isSub, setIsSub] = useState<boolean>(false);
   const [showMobileSidebar, setShowMobileSidebar] = useState<boolean>(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   
   // Data State
   const [viewData, setViewData] = useState<any[]>([]);
@@ -350,10 +352,11 @@ export default function App() {
         }}
         isOpenOnMobile={showMobileSidebar}
         onCloseMobile={() => setShowMobileSidebar(false)}
+        isCollapsed={isSidebarCollapsed}
       />
 
       {/* Workspace content wrapper */}
-      <div className="flex-grow lg:ml-72 flex flex-col min-h-screen min-w-0">
+      <div className={`flex-grow flex flex-col min-h-screen min-w-0 transition-all duration-300 ${isSidebarCollapsed ? "lg:ml-0" : "lg:ml-72"}`}>
         
         {/* Global Toolbar Header - Bootstrap-like Flat Strip nav */}
         <header className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between z-30 transition-all">
@@ -363,6 +366,13 @@ export default function App() {
               className="lg:hidden p-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded border border-slate-200 hover:bg-slate-200 transition-all cursor-pointer"
             >
               <Menu className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              className="hidden lg:flex p-1.5 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-760 transition-all cursor-pointer"
+              title={isSidebarCollapsed ? "Tampilkan Sidebar" : "Sembunyikan Sidebar"}
+            >
+              {isSidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
             </button>
             <div>
               <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-0.5">

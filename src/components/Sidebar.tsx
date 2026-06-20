@@ -10,6 +10,7 @@ interface SidebarProps {
   onSelectView: (viewId: string, title: string, isSub: boolean) => void;
   isOpenOnMobile: boolean;
   onCloseMobile: () => void;
+  isCollapsed?: boolean;
 }
 
 const menuSections: MenuSection[] = [
@@ -151,8 +152,9 @@ const menuSections: MenuSection[] = [
   }
 ];
 
-export default function Sidebar({ currentViewId, onSelectView, isOpenOnMobile, onCloseMobile }: SidebarProps) {
+export default function Sidebar({ currentViewId, onSelectView, isOpenOnMobile, onCloseMobile, isCollapsed = false }: SidebarProps) {
   // Store open status of accordions
+  const [isDashboardOpen, setIsDashboardOpen] = useState<boolean>(true);
   const [openSubsections, setOpenSubsections] = useState<Record<string, boolean>>(() => {
     // Determine initially open sections based on current selective ID
     const initial: Record<string, boolean> = {};
@@ -206,8 +208,9 @@ export default function Sidebar({ currentViewId, onSelectView, isOpenOnMobile, o
 
       <aside className={`
         fixed top-0 bottom-0 left-0 w-72 bg-slate-900 text-slate-300 z-50 overflow-y-auto border-r border-slate-800
-        transition-transform duration-300 lg:translate-x-0
-        ${isOpenOnMobile ? "translate-x-0" : "-translate-x-full"}
+        transition-transform duration-300
+        ${isCollapsed ? "lg:-translate-x-full" : "lg:translate-x-0"}
+        ${isOpenOnMobile ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}>
         {/* Header */}
         <div className="sticky top-0 bg-slate-950 px-5 py-4 border-b border-slate-800 flex items-center justify-between z-20">
@@ -233,16 +236,27 @@ export default function Sidebar({ currentViewId, onSelectView, isOpenOnMobile, o
           {menuSections.map(section => (
             <div key={section.id} className="space-y-1">
               {/* Category Title Header - Bootstrap Style */}
-              <div className="px-3 py-1 flex items-center gap-2 bg-slate-800/20 rounded">
-                {selectSectionIcon(section.icon)}
-                <span className="text-[10.5px] font-bold text-slate-450 tracking-wider uppercase text-slate-400">
-                  {section.title}
-                </span>
+              <div 
+                onClick={section.title === "Dashboard" ? () => setIsDashboardOpen(!isDashboardOpen) : undefined}
+                className={`px-3 py-1 flex items-center justify-between bg-slate-800/20 rounded ${section.title === "Dashboard" ? "cursor-pointer hover:bg-slate-800/45 select-none" : ""}`}
+              >
+                <div className="flex items-center gap-2">
+                  {selectSectionIcon(section.icon)}
+                  <span className="text-[10.5px] font-bold text-slate-450 tracking-wider uppercase text-slate-400">
+                    {section.title}
+                  </span>
+                </div>
+                {section.title === "Dashboard" && (
+                  <ChevronRight className={`w-3.5 h-3.5 transition-transform duration-200 text-slate-500 ${isDashboardOpen ? "rotate-90 text-blue-400" : ""}`} />
+                )}
               </div>
 
               {/* Directly mapped items if there are no subaccordions */}
               {section.items && (
-                <div className="space-y-1 mt-1 pl-1">
+                <div className={`
+                  overflow-hidden transition-all duration-200 pl-1 space-y-1 mt-1
+                  ${isDashboardOpen ? "max-h-[500px] opacity-100 py-1" : "max-h-0 opacity-0 pointer-events-none"}
+                `}>
                   {section.items.map(item => {
                     const isSelected = currentViewId === item.id;
                     return (

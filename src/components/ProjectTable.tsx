@@ -869,7 +869,7 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
               className="px-3 py-1.5 bg-green-50 hover:bg-green-100 border border-green-300 dark:bg-green-950/20 text-green-700 dark:text-green-400 rounded text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-40"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Unduh Excel</span>
+              <span>Unduh EXCEL</span>
             </button>
             <button
               onClick={handleExportPDF}
@@ -877,7 +877,7 @@ export default function ProjectTable({ data, viewId, loading, onEdit, onDelete, 
               className="px-3 py-1.5 bg-red-50 hover:bg-red-100 border border-red-300 dark:bg-red-950/20 text-red-700 dark:text-red-400 rounded text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-40"
             >
               <FileDown className="w-3.5 h-3.5" />
-              <span>PDF Rekap</span>
+              <span>Unduh PDF</span>
             </button>
           </div>
         </div>
