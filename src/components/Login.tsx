@@ -61,16 +61,16 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           <div className="mx-auto w-12 h-12 bg-white/10 text-white rounded-circle flex items-center justify-center shadow-sm mb-3">
             <Sparkles className="w-6 h-6 text-white" />
           </div>
-          <h2 className="text-white text-lg font-bold uppercase tracking-wide mb-1">PROYEK PORTAL</h2>
+          <h2 className="text-white text-lg font-bold uppercase tracking-wide mb-1">PANTAU PROYEK</h2>
           <p className="text-slate-100 text-xs font-normal">
-            Dashboard Monitoring &amp; Keuangan
+            Dashboard Monitoring Proyek &amp; Keuangan
           </p>
         </div>
 
         {/* Bootstrap Form Fields Container */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="text-center mb-3">
-            <h3 className="text-slate-900 dark:text-white text-base font-bold mb-1">Silakan Masuk</h3>
+            <h3 className="text-slate-900 dark:text-white text-base font-bold mb-1">Silahkan Masuk</h3>
             <p className="text-slate-500 dark:text-slate-400 text-xs">
               Gunakan kredensial akun Anda untuk mengakses sistem.
             </p>
@@ -150,7 +150,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             ) : (
               <>
                 <LogIn className="w-4 h-4" />
-                <span>Login</span>
+                <span>Masuk</span>
               </>
             )}
           </button>
