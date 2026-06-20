@@ -356,7 +356,7 @@ export default function App() {
       />
 
       {/* Workspace content wrapper */}
-      <div className={`flex-grow flex flex-col min-h-screen min-w-0 transition-all duration-300 ${isSidebarCollapsed ? "lg:ml-0" : "lg:ml-72"}`}>
+      <div className={`flex-grow flex flex-col min-h-screen min-w-0 transition-all duration-300 ${isSidebarCollapsed ? "ml-16" : "ml-0 lg:ml-72"}`}>
         
         {/* Global Toolbar Header - Bootstrap-like Flat Strip nav */}
         <header className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between z-30 transition-all">
@@ -369,7 +369,7 @@ export default function App() {
             </button>
             <button
               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              className="hidden lg:flex p-1.5 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-760 transition-all cursor-pointer"
+              className="flex p-1.5 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-760 transition-all cursor-pointer"
               title={isSidebarCollapsed ? "Tampilkan Sidebar" : "Sembunyikan Sidebar"}
             >
               {isSidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -386,15 +386,6 @@ export default function App() {
 
           <div className="flex items-center gap-2">
             
-            {/* Dark mode slider */}
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="p-1.5 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded transition-all cursor-pointer"
-              title="Ganti Tema Visual"
-            >
-              {darkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4" />}
-            </button>
-
             {/* Profile Avatar Badge - Bootstrap outline style */}
             <div className="items-center gap-2 hidden sm:flex px-2.5 py-1 bg-slate-50 dark:bg-slate-800/65 border border-slate-300 dark:border-slate-705 rounded">
               <div className="w-6 h-6 bg-blue-50 dark:bg-blue-950/20 text-blue-600 rounded flex items-center justify-center font-extrabold text-xs border border-blue-200">

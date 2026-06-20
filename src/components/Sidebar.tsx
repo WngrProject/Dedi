@@ -207,20 +207,20 @@ export default function Sidebar({ currentViewId, onSelectView, isOpenOnMobile, o
       )}
 
       <aside className={`
-        fixed top-0 bottom-0 left-0 w-72 bg-slate-900 text-slate-300 z-50 overflow-y-auto border-r border-slate-800
-        transition-transform duration-300
-        ${isCollapsed ? "lg:-translate-x-full" : "lg:translate-x-0"}
-        ${isOpenOnMobile ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+        fixed top-0 bottom-0 left-0 bg-slate-900 text-slate-300 z-50 border-r border-slate-800
+        transition-all duration-300
+        ${isCollapsed ? "w-16 overflow-y-visible translate-x-0" : "w-72 overflow-y-auto"}
+        ${isCollapsed ? "" : (isOpenOnMobile ? "translate-x-0 w-72 overflow-y-auto" : "-translate-x-full lg:translate-x-0")}
       `}>
         {/* Header */}
-        <div className="sticky top-0 bg-slate-950 px-5 py-4 border-b border-slate-800 flex items-center justify-between z-20">
+        <div className={`sticky top-0 bg-slate-950 border-b border-slate-800 flex items-center justify-between z-20 transition-all ${isCollapsed ? "px-4 py-4 justify-center" : "px-5 py-4"}`}>
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-blue-600 text-white rounded flex items-center justify-center shadow">
+            <div className="w-8 h-8 bg-blue-600 text-white rounded flex items-center justify-center shadow flex-shrink-0 animate-pulse-subtle">
               <Sparkles className="w-4.5 h-4.5" />
             </div>
-            <div>
-              <h1 className="font-bold text-white tracking-normal text-sm leading-tight uppercase">MY PROYEK</h1>
-              <p className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Bootstrap v5 Theme</p>
+            <div className={isCollapsed ? "lg:hidden" : "block"}>
+              <h1 className="font-bold text-white tracking-normal text-sm leading-tight uppercase whitespace-nowrap">MY PROYEK</h1>
+              <p className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase whitespace-nowrap">Pantau Proyek</p>
             </div>
           </div>
           <button 
@@ -232,120 +232,226 @@ export default function Sidebar({ currentViewId, onSelectView, isOpenOnMobile, o
         </div>
 
         {/* Navigation Map */}
-        <div className="px-2.5 py-4 space-y-4">
-          {menuSections.map(section => (
-            <div key={section.id} className="space-y-1">
-              {/* Category Title Header - Bootstrap Style */}
-              <div 
-                onClick={section.title === "Dashboard" ? () => setIsDashboardOpen(!isDashboardOpen) : undefined}
-                className={`px-3 py-1 flex items-center justify-between bg-slate-800/20 rounded ${section.title === "Dashboard" ? "cursor-pointer hover:bg-slate-800/45 select-none" : ""}`}
-              >
-                <div className="flex items-center gap-2">
-                  {selectSectionIcon(section.icon)}
-                  <span className="text-[10.5px] font-bold text-slate-450 tracking-wider uppercase text-slate-400">
-                    {section.title}
-                  </span>
+        <div className={`py-4 space-y-4 transition-all ${isCollapsed ? "px-1 space-y-5" : "px-2.5 space-y-4"}`}>
+          {menuSections.map(section => {
+            if (isCollapsed) {
+              const isAnyChildSelected = section.items 
+                ? section.items.some(it => it.id === currentViewId)
+                : section.subsections?.some(sub => sub.items.some(it => it.id === currentViewId));
+
+              return (
+                <div 
+                  key={section.id} 
+                  className="relative group flex justify-center py-1 select-none"
+                >
+                  {/* Icon Trigger */}
+                  <button
+                    className={`
+                      p-2 border border-transparent rounded-lg text-slate-400 group-hover:text-white transition-all cursor-pointer relative flex items-center justify-center
+                      ${isAnyChildSelected 
+                        ? "bg-blue-600 text-white shadow-md font-bold border-blue-500" 
+                        : "hover:bg-slate-800 text-slate-400"
+                      }
+                    `}
+                    title={section.title}
+                  >
+                    {selectSectionIcon(section.icon)}
+                  </button>
+
+                  {/* Absolute Floating Popup Submenu */}
+                  <div className="absolute left-full top-0 ml-2 w-64 bg-slate-900 border border-slate-800 rounded-lg shadow-2xl py-2 invisible opacity-0 pointer-events-none group-hover:visible group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-250 z-50">
+                    <div className="px-3.5 py-2 border-b border-slate-800/80 mb-2">
+                      <h4 className="text-[10.5px] font-bold text-slate-350 tracking-wider uppercase flex items-center gap-2">
+                        {selectSectionIcon(section.icon)}
+                        <span>{section.title}</span>
+                      </h4>
+                    </div>
+
+                    {section.items && (
+                      <div className="px-1.5 space-y-0.5">
+                        {section.items.map(item => {
+                          const isSelected = currentViewId === item.id;
+                          return (
+                            <button
+                              key={item.id}
+                              onClick={() => {
+                                onSelectView(item.id, item.title, false);
+                                onCloseMobile();
+                              }}
+                              className={`
+                                w-full flex items-center gap-2.5 px-3 py-1.5 text-xs font-semibold rounded text-left cursor-pointer transition-all
+                                ${isSelected 
+                                  ? "bg-blue-600 text-white font-bold" 
+                                  : "hover:bg-slate-800 text-slate-400 hover:text-slate-200"
+                                }
+                              `}
+                            >
+                              <List className="w-3.5 h-3.5" />
+                              <span className="truncate">{item.title}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {section.subsections && (
+                      <div className="max-h-[75vh] overflow-y-auto space-y-3 px-1.5 custom-scrollbar">
+                        {section.subsections.map(sub => {
+                          return (
+                            <div key={sub.id} className="space-y-1">
+                              <div className="px-2 py-0.5 text-[9px] font-bold text-slate-500 uppercase tracking-widest border-l-2 border-slate-700">
+                                {sub.title}
+                              </div>
+                              <div className="space-y-0.5">
+                                {sub.items.map(item => {
+                                  const isSelected = currentViewId === item.id;
+                                  return (
+                                    <button
+                                      key={item.id}
+                                      onClick={() => {
+                                        onSelectView(item.id, item.title, true);
+                                        onCloseMobile();
+                                      }}
+                                      className={`
+                                        w-full flex items-center gap-2 px-3 py-1 text-xs rounded text-left cursor-pointer transition-all
+                                        ${isSelected 
+                                          ? "bg-blue-600/15 text-blue-450 font-bold border border-blue-500/10" 
+                                          : "hover:bg-slate-800/40 text-slate-400 hover:text-slate-300"
+                                        }
+                                      `}
+                                    >
+                                      <span className={isSelected ? "text-blue-400" : "text-slate-500"}>
+                                        {getSubitemIcon(item.id)}
+                                      </span>
+                                      <span className="truncate">{item.title.split(" - ").pop()}</span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
-                {section.title === "Dashboard" && (
-                  <ChevronRight className={`w-3.5 h-3.5 transition-transform duration-200 text-slate-500 ${isDashboardOpen ? "rotate-90 text-blue-400" : ""}`} />
-                )}
-              </div>
+              );
+            }
 
-              {/* Directly mapped items if there are no subaccordions */}
-              {section.items && (
-                <div className={`
-                  overflow-hidden transition-all duration-200 pl-1 space-y-1 mt-1
-                  ${isDashboardOpen ? "max-h-[500px] opacity-100 py-1" : "max-h-0 opacity-0 pointer-events-none"}
-                `}>
-                  {section.items.map(item => {
-                    const isSelected = currentViewId === item.id;
-                    return (
-                      <button
-                        key={item.id}
-                        onClick={() => {
-                          onSelectView(item.id, item.title, false);
-                          onCloseMobile();
-                        }}
-                        className={`
-                          w-full flex items-center gap-3 px-3 py-1.5 text-xs font-semibold rounded tracking-normal cursor-pointer text-left transition-all
-                          ${isSelected 
-                            ? "bg-blue-600 text-white shadow-sm font-bold" 
-                            : "hover:bg-slate-800 text-slate-400 hover:text-slate-200"
-                          }
-                        `}
-                      >
-                        <List className="w-4 h-4 ml-0.5" />
-                        <span>{item.title}</span>
-                      </button>
-                    );
-                  })}
+            return (
+              <div key={section.id} className="space-y-1">
+                {/* Category Title Header - Bootstrap Style */}
+                <div 
+                  onClick={section.title === "Dashboard" ? () => setIsDashboardOpen(!isDashboardOpen) : undefined}
+                  className={`px-3 py-1 flex items-center justify-between bg-slate-800/20 rounded ${section.title === "Dashboard" ? "cursor-pointer hover:bg-slate-800/45 select-none" : ""}`}
+                >
+                  <div className="flex items-center gap-2">
+                    {selectSectionIcon(section.icon)}
+                    <span className="text-[10.5px] font-bold text-slate-450 tracking-wider uppercase text-slate-400">
+                      {section.title}
+                    </span>
+                  </div>
+                  {section.title === "Dashboard" && (
+                    <ChevronRight className={`w-3.5 h-3.5 transition-transform duration-200 text-slate-500 ${isDashboardOpen ? "rotate-90 text-blue-400" : ""}`} />
+                  )}
                 </div>
-              )}
 
-              {/* Accordion List for subsections */}
-              {section.subsections && (
-                <div className="space-y-1 mt-1 pl-1">
-                  {section.subsections.map(sub => {
-                    const isAnySelected = sub.items.some(it => it.id === currentViewId);
-                    const isOpen = !!openSubsections[sub.id];
-
-                    return (
-                      <div key={sub.id} className="space-y-0.5">
-                        {/* Subheader dispatch trigger */}
+                {/* Directly mapped items if there are no subaccordions */}
+                {section.items && (
+                  <div className={`
+                    overflow-hidden transition-all duration-200 pl-1 space-y-1 mt-1
+                    ${isDashboardOpen ? "max-h-[500px] opacity-100 py-1" : "max-h-0 opacity-0 pointer-events-none"}
+                  `}>
+                    {section.items.map(item => {
+                      const isSelected = currentViewId === item.id;
+                      return (
                         <button
-                          onClick={() => toggleSubsection(sub.id)}
+                          key={item.id}
+                          onClick={() => {
+                            onSelectView(item.id, item.title, false);
+                            onCloseMobile();
+                          }}
                           className={`
-                            w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold rounded text-left cursor-pointer transition-all
-                            ${isAnySelected 
-                              ? "bg-slate-800 text-blue-400 font-bold border border-slate-700" 
-                              : "hover:bg-slate-800/60 text-slate-400 hover:text-slate-200"
+                            w-full flex items-center gap-3 px-3 py-1.5 text-xs font-semibold rounded tracking-normal cursor-pointer text-left transition-all
+                            ${isSelected 
+                              ? "bg-blue-600 text-white shadow-sm font-bold" 
+                              : "hover:bg-slate-800 text-slate-400 hover:text-slate-200"
                             }
                           `}
                         >
-                          <span className="truncate">{sub.title}</span>
-                          <ChevronRight className={`
-                            w-3.5 h-3.5 transition-transform duration-200
-                            ${isOpen ? "rotate-90 text-blue-400" : "text-slate-500"}
-                          `} />
+                          <List className="w-4 h-4 ml-0.5" />
+                          <span>{item.title}</span>
                         </button>
+                      );
+                    })}
+                  </div>
+                )}
 
-                        {/* Collapsed items */}
-                        <div className={`
-                          overflow-hidden transition-all duration-200 pl-3 space-y-0.5
-                          ${isOpen ? "max-h-[1000px] opacity-100 py-1" : "max-h-0 opacity-0"}
-                        `}>
-                          {sub.items.map(item => {
-                            const isSelected = currentViewId === item.id;
-                            return (
-                              <button
-                                key={item.id}
-                                onClick={() => {
-                                  onSelectView(item.id, item.title, true);
-                                  onCloseMobile();
-                                }}
-                                className={`
-                                  w-full flex items-center gap-2.5 px-3 py-1.5 text-xs rounded text-left cursor-pointer transition-all
-                                  ${isSelected 
-                                    ? "bg-blue-600/15 text-blue-450 font-bold border border-blue-500/10" 
-                                    : "hover:bg-slate-800/40 text-slate-500 hover:text-slate-300"
-                                  }
-                                `}
-                              >
-                                <span className={isSelected ? "text-blue-400" : "text-slate-500"}>
-                                  {getSubitemIcon(item.id)}
-                                </span>
-                                <span className="truncate">{item.title.split(" - ").pop()}</span>
-                              </button>
-                            );
-                          })}
+                {/* Accordion List for subsections */}
+                {section.subsections && (
+                  <div className="space-y-1 mt-1 pl-1">
+                    {section.subsections.map(sub => {
+                      const isAnySelected = sub.items.some(it => it.id === currentViewId);
+                      const isOpen = !!openSubsections[sub.id];
+
+                      return (
+                        <div key={sub.id} className="space-y-0.5">
+                          {/* Subheader dispatch trigger */}
+                          <button
+                            onClick={() => toggleSubsection(sub.id)}
+                            className={`
+                              w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold rounded text-left cursor-pointer transition-all
+                              ${isAnySelected 
+                                ? "bg-slate-800 text-blue-400 font-bold border border-slate-700" 
+                                : "hover:bg-slate-800/60 text-slate-400 hover:text-slate-200"
+                              }
+                            `}
+                          >
+                            <span className="truncate">{sub.title}</span>
+                            <ChevronRight className={`
+                              w-3.5 h-3.5 transition-transform duration-200
+                              ${isOpen ? "rotate-90 text-blue-400" : "text-slate-500"}
+                            `} />
+                          </button>
+
+                          {/* Collapsed items */}
+                          <div className={`
+                            overflow-hidden transition-all duration-200 pl-3 space-y-0.5
+                            ${isOpen ? "max-h-[1000px] opacity-100 py-1" : "max-h-0 opacity-0"}
+                          `}>
+                            {sub.items.map(item => {
+                              const isSelected = currentViewId === item.id;
+                              return (
+                                <button
+                                  key={item.id}
+                                  onClick={() => {
+                                    onSelectView(item.id, item.title, true);
+                                    onCloseMobile();
+                                  }}
+                                  className={`
+                                    w-full flex items-center gap-2.5 px-3 py-1.5 text-xs rounded text-left cursor-pointer transition-all
+                                    ${isSelected 
+                                      ? "bg-blue-600/15 text-blue-450 font-bold border border-blue-500/10" 
+                                      : "hover:bg-slate-800/40 text-slate-500 hover:text-slate-300"
+                                    }
+                                  `}
+                                >
+                                  <span className={isSelected ? "text-blue-400" : "text-slate-500"}>
+                                    {getSubitemIcon(item.id)}
+                                  </span>
+                                  <span className="truncate">{item.title.split(" - ").pop()}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          ))}
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </aside>
     </>
